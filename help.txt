@@ -1,2 +1,10 @@
-Put your generator docs in here.
-They will be displayed when calling the "help" task of your generator.
+Geddy MVC controller generator.
+
+Generates a geddy controller for you.
+
+Usage:
+
+    geddy gen controller create[name]
+
+        name        Name of your controller
+        -f --force  (optional) use to replace an existing controller
