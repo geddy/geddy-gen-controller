@@ -19,6 +19,12 @@ function flagSet(shortName, name) {
 
 // Tasks
 task('default', function(name) {
+  var t = jake.Task.create;
+  t.reenable();
+  t.invoke(name);
+});
+
+task('create', function(name) {
   var self = this;
 
   if (!name) {
