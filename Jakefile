@@ -10,7 +10,7 @@ require(path.join(geddyPath,'lib/geddy'));
 var cwd = process.cwd()
   , utils = require(path.join(geddyPath, 'lib/utils'))
   , Adapter = require(path.join(geddyPath, 'lib/template/adapters')).Adapter
-  , genDirname = path.join(__dirname, '..');
+  , genDirname = __dirname;
 
 
 function flagSet(shortName, name) {
