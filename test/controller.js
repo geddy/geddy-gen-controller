@@ -42,7 +42,7 @@ tests = {
       }
       var filePath = path.join(controllersDir, 'test.js');
       assert.equal(fs.existsSync(filePath), true);
-      assert.equal(fs.readFileSync(filePath, {encdoing:'utf8'}), fs.readFileSync(path.join(__dirname, 'fixtures', 'test.js'), { encoding: 'utf8'}));
+      assert.equal(fs.readFileSync(filePath, {encoding:'utf8'}), fs.readFileSync(path.join(__dirname, 'fixtures', 'test.js'), { encoding: 'utf8'}));
       next();
     });
   },
