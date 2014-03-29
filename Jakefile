@@ -14,7 +14,7 @@ var cwd = process.cwd()
 
 
 function flagSet(shortName, name) {
-  return process.argv.indexOf(shortName) !== -1 && process.argv.indexOf(name);
+  return process.argv.indexOf(shortName) !== -1 || process.argv.indexOf(name) !== -1;
 }
 
 // Tasks
