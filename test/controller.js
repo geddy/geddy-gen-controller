@@ -18,7 +18,8 @@ function createController(name, argv, cb)
     argv = [];
   }
 
-  exec(path.join(__dirname, 'helpers', 'exec.js') + ' ' + name + ' ' +argv.join(' '), cb);
+  var p = exec(path.join(__dirname, 'helpers', 'exec.js') + ' ' + name + ' ' +argv.join(' '), cb);
+  p.stdout.pipe(process.stdout);
 }
 
 tests = {
