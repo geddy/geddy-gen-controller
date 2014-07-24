@@ -6,5 +6,6 @@ Usage:
 
     geddy gen controller create[name]
 
-        name        Name of your controller
-        -f --force  (optional) use to replace an existing controller
+        name            Name of your controller
+        -r --resource   (optional) if set, a resource controller will be created
+        -f --force      (optional) use to replace an existing controller

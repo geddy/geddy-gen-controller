@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path')
   , utilities = require('utilities')
+  , helpers = require('./helpers')
   , geddyPath = path.normalize(path.join(require.resolve('geddy'), '../../'));
 
 // Load the basic Geddy toolkit
@@ -39,11 +40,15 @@ task('create', function(name) {
     return;
   }
 
+  var force = flagSet('-f','--force');
+  var resource = flagSet('-r', '--resource');
+
   // sanitize the controller name
   var controllerFileName = name.toLowerCase().replace(/\s|-/g, '_');
+  if (resource) {
+    controllerFileName = utilities.string.getInflection(controllerFileName, 'filename', 'plural');
+  }
   var controllerFilePath = path.join(controllersDir, controllerFileName + '.js');
-
-  var force = flagSet('-f','--force');
 
   if (!force && fs.existsSync(controllerFilePath)) {
     fail('Controller already exists. Use -f to replace it.');
@@ -53,7 +58,7 @@ task('create', function(name) {
   // create constructor name
   var constructorName = utilities.string.capitalize(utilities.string.camelize(controllerFileName));
 
-  var contents = fs.readFileSync(path.join(__dirname, 'template', 'controller.js.ejs'),{encoding:'utf8'});
+  var contents = fs.readFileSync(path.join(__dirname, 'template', (resource) ? 'resource_controller.js.ejs' : 'controller.js.ejs'),{encoding:'utf8'});
   var adapter = new Adapter({engine: 'ejs', template: contents});
 
   fs.writeFileSync(
@@ -68,6 +73,54 @@ task('create', function(name) {
   );
 
   console.log('Created controller "' + constructorName + '" in app/controllers/' + controllerFileName + '.js');
+
+  // create route
+  jake.Task.route.invoke(name);
+});
+
+task('route', function (name) {
+  if (!name) {
+    throw new Error('No route name specified.');
+  }
+
+  var resource = flagSet('-r', '--resource');
+
+  var names = utils.string.getInflections(name)
+    , routerPath = helpers.getRouterPath()
+    , routeType = resource ? 'Resource' : 'Bare'
+    , newRoute;
+
+  if (routerPath) {
+    if (routerPath.match('.coffee')) {
+      if (!resource) {
+        newRoute = 'router.match(\'/' +  names.filename.plural +
+          '\').to controller: \'' + names.constructor.plural +
+          '\', action: \'index\'';
+      } else {
+        newRoute = 'router.resource \'' +  names.filename.plural + '\'';
+      }
+    } else if (routerPath.match('.js')) {
+      if (!resource) {
+        newRoute = 'router.match(\'/' +  names.filename.plural +
+          '\').to({controller: \'' + names.constructor.plural +
+          '\', action: \'index\'});';
+      } else {
+        newRoute = 'router.resource(\'' +  names.filename.plural + '\');';
+      }
+    }
+
+    if (helpers.addRoute(routerPath, newRoute)) {
+      console.log('[Added] ' + routeType + ' ' + names.filename.plural +
+        ' route added to ' + routerPath);
+    }
+    else {
+      console.log(routeType + ' ' + names.filename.plural + ' route already defined in ' +
+        routerPath);
+    }
+  }
+  else {
+    console.log('There is no router file to add routes too');
+  }
 });
 
 task('help', function() {
