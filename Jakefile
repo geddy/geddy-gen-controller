@@ -1,22 +1,15 @@
-var fs = require('fs');
 var path = require('path')
+  , fs = require('fs')
+  , cwd = process.cwd()
   , utilities = require('utilities')
+  , genutils = require('geddy-genutils')
+  , exec = require('child_process').exec
   , helpers = require('./helpers')
-  , geddyPath = path.normalize(path.join(require.resolve('geddy'), '../../'));
-
-// Load the basic Geddy toolkit
-require(path.join(geddyPath,'lib/geddy'));
-
-// Dependencies
-var cwd = process.cwd()
-  , utils = require(path.join(geddyPath, 'lib/utils'))
-  , Adapter = require(path.join(geddyPath, 'lib/template/adapters')).Adapter
   , genDirname = __dirname;
 
-
-function flagSet(shortName, name) {
-  return process.argv.indexOf(shortName) !== -1 || process.argv.indexOf(name) !== -1;
-}
+// Load the basic Geddy toolkit
+genutils.loadGeddy();
+var utils = genutils.loadGeddyUtils();
 
 // Tasks
 task('default', function(name) {
@@ -40,8 +33,8 @@ task('create', function(name) {
     return;
   }
 
-  var force = flagSet('-f','--force');
-  var resource = flagSet('-r', '--resource');
+  var force = genutils.flagSet('-f','--force');
+  var resource = genutils.flagSet('-r', '--resource');
 
   // sanitize the controller name
   var controllerFileName = name.toLowerCase().replace(/\s|-/g, '_');
@@ -58,18 +51,15 @@ task('create', function(name) {
   // create constructor name
   var constructorName = utilities.string.capitalize(utilities.string.camelize(controllerFileName));
 
-  var contents = fs.readFileSync(path.join(__dirname, 'template', (resource) ? 'resource_controller.js.ejs' : 'controller.js.ejs'),{encoding:'utf8'});
-  var adapter = new Adapter({engine: 'ejs', template: contents});
-
-  fs.writeFileSync(
+  genutils.template.write(
+    path.join(__dirname, 'template', (resource) ? 'resource_controller.js.ejs' : 'controller.js.ejs'),
     controllerFilePath,
-    adapter.render({
+    {
       controllersDir: controllersDir,
       controllerFilePath: controllerFilePath,
       constructorName: constructorName,
       controllerFileName: controllerFileName
-    }),
-    'utf8'
+    }
   );
 
   console.log('Created controller "' + constructorName + '" in app/controllers/' + controllerFileName + '.js');
@@ -83,7 +73,7 @@ task('route', function (name) {
     throw new Error('No route name specified.');
   }
 
-  var resource = flagSet('-r', '--resource');
+  var resource = genutils.flagSet('-r', '--resource');
 
   var names = utils.string.getInflections(name)
     , routerPath = helpers.getRouterPath()
