@@ -24,6 +24,11 @@ namespace(ns, function() {
   task('create', function(name) {
     var self = this;
 
+    if (!genutils.inAppRoot()) {
+      fail('You must run this generator from the root of your application.');
+      return;
+    }
+
     if (!name) {
       fail('Missing controller name.');
       return;
@@ -31,10 +36,6 @@ namespace(ns, function() {
 
     var appPath = process.cwd();
     var controllersDir = path.join(appPath, 'app', 'controllers');
-    if (!fs.existsSync(controllersDir) || !fs.statSync(controllersDir).isDirectory()) {
-      fail('You must run this generator from the root of your application.');
-      return;
-    }
 
     var force = genutils.flagSet('-f','--force');
     var resource = genutils.flagSet('-r', '--resource');
