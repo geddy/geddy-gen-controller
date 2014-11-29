@@ -41,9 +41,12 @@ namespace(ns, function() {
     var resource = genutils.flagSet('-r', '--resource');
 
     // sanitize the controller name
-    var controllerFileName = name.toLowerCase().replace(/\s|-/g, '_');
+    var controllerFileName = name.replace(/\s|-/g, '_');
     if (resource) {
       controllerFileName = utilities.string.getInflection(controllerFileName, 'filename', 'plural');
+    }
+    else {
+      controllerFileName = utilities.string.getInflection(controllerFileName, 'filename', 'normal');
     }
     var controllerFilePath = path.join(controllersDir, controllerFileName + '.js');
 
